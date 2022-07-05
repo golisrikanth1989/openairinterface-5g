@@ -310,7 +310,7 @@ services:
             retries: 5
 
     oai-nr-ue1:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: rfsim5g-oai-nr-ue1
         environment: 
@@ -334,7 +334,7 @@ services:
             retries: 5
 
     oai-nr-ue2:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: rfsim5g-oai-nr-ue2
         environment: 
@@ -358,7 +358,7 @@ services:
             retries: 5
 
     oai-nr-ue3:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: rfsim5g-oai-nr-ue3
         environment: 
