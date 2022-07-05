@@ -20,6 +20,26 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+    oai-nrf:
+        container_name: "rfsim5g-oai-nrf"
+        image: oai-nrf:latest
+        environment:
+            - NRF_INTERFACE_NAME_FOR_SBI=eth0
+            - NRF_INTERFACE_PORT_FOR_SBI=80
+            - NRF_INTERFACE_HTTP2_PORT_FOR_SBI=9090
+            - NRF_API_VERSION=v1
+            - INSTANCE=0
+            - PID_DIRECTORY=/var/run
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.130
+        volumes:
+            - ./nrf-healthcheck.sh:/openair-nrf/bin/nrf-healthcheck.sh
+        healthcheck:
+            test: /bin/bash -c "/openair-nrf/bin/nrf-healthcheck.sh"
+            interval: 10s
+            timeout: 5s
+            retries: 5
     mysql:
         container_name: "rfsim5g-mysql"
         image: mysql:5.7
@@ -120,7 +140,7 @@ services:
             - SMF_INTERFACE_PORT_FOR_SBI=80
             - SMF_INTERFACE_HTTP2_PORT_FOR_SBI=9090
             - SMF_API_VERSION=v1
-            - DEFAULT_DNS_IPV4_ADDRESS=192.168.18.129
+            - DEFAULT_DNS_IPV4_ADDRESS=172.21.3.100
             - DEFAULT_DNS_SEC_IPV4_ADDRESS=4.4.4.4
             - AMF_IPV4_ADDRESS=0.0.0.0
             - AMF_PORT=80
@@ -213,7 +233,8 @@ services:
         entrypoint: /bin/bash -c \
               "apt update; apt install -y procps iptables iproute2 iperf iputils-ping;"\
               "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;"\
-              "ip route add 12.1.1.0/24 via 192.168.72.134 dev eth0; sleep infinity"
+              "ip route add 12.1.1.0/24 via 192.168.72.134 dev eth0;"\
+              "iperf -s -u -i 1;"
         depends_on:
             - oai-spgwu
         networks:
@@ -224,14 +245,15 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
-    oai-gnb:
+
+    oai-gnb1:
         image: oai-gnb:develop
         privileged: true
-        container_name: rfsim5g-oai-gnb
+        container_name: rfsim5g-oai-gnb1
         environment: 
             RFSIMULATOR: server
             USE_SA_TDD_MONO: 'yes'
-            GNB_NAME: gnb-rfsim
+            GNB_NAME: gnb-rfsim1
             TAC: 1
             MCC: '208'
             MNC: '99'
@@ -241,37 +263,60 @@ services:
             NSSAI_SD1: 112233
             AMF_IP_ADDRESS: 192.168.71.132
             GNB_NGA_IF_NAME: eth0
-            GNB_NGA_IP_ADDRESS: 192.168.71.140
+            GNB_NGA_IP_ADDRESS: 192.168.71.141
             GNB_NGU_IF_NAME: eth0
-            GNB_NGU_IP_ADDRESS: 192.168.71.140
+            GNB_NGU_IP_ADDRESS: 192.168.71.141
             USE_ADDITIONAL_OPTIONS: --sa -E --rfsim --log_config.global_log_options level,nocolor,time
         depends_on:
-             oai-nrf:
-              condition: service_healthy
-             mysql:
-              condition: service_healthy
-             oai-amf:
-              condition: service_healthy
-             oai-smf:
-              condition: service_healthy
-             oai-spgwu:
-              condition: service_healthy
-             oai-ext-dn:
-              condition: service_healthy
+            - oai-ext-dn
         networks:
             public_net:
-                ipv4_address: 192.168.71.140
+                ipv4_address: 192.168.71.141
         healthcheck:
             test: /bin/bash -c "pgrep nr-softmodem"
             interval: 10s
             timeout: 5s
             retries: 5
-    oai-nr-ue:
-        image: oai-nr-ue:develop
+    oai-gnb2:
+        image: oai-gnb:develop
         privileged: true
-        container_name: rfsim5g-oai-nr-ue
+        container_name: rfsim5g-oai-gnb2
         environment: 
-            RFSIMULATOR: 192.168.71.140
+            RFSIMULATOR: server
+            USE_SA_FDD_MONO: 'yes'
+            GNB_NAME: gnb-rfsim2
+            TAC: 1
+            MCC: '208'
+            MNC: '99'
+            MNC_LENGTH: 2
+            NSSAI_SST: 1
+            NSSAI_SD0: 1
+            NSSAI_SD1: 112233
+            AMF_IP_ADDRESS: 192.168.71.132
+            GNB_NGA_IF_NAME: eth0
+            GNB_NGA_IP_ADDRESS: 192.168.71.142
+            GNB_NGU_IF_NAME: eth0
+            GNB_NGU_IP_ADDRESS: 192.168.71.142
+            USE_ADDITIONAL_OPTIONS: --sa -E --rfsim --log_config.global_log_options level,nocolor,time
+        depends_on:
+            - oai-ext-dn
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.142
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-softmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    oai-nr-ue1:
+        image: oai-nr-ue:5fi
+        entrypoint: /bin/bash -c \
+              "apt update; apt install -y procps iptables iproute2 iperf iputils-ping;"
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue1
+        environment: 
+            RFSIMULATOR: 192.168.71.141
             FULL_IMSI: '208990100001100'
             FULL_KEY: 'fec86ba6eb707ed08905757b1bb44b8f'
             OPC: 'C42449363BBAD02B66D16BC975D77CC1'
@@ -280,16 +325,86 @@ services:
             NSSAI_SD: 1
             USE_ADDITIONAL_OPTIONS: -E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time
         depends_on:
-            - oai-gnb
+            - oai-gnb1
         networks:
             public_net:
-                ipv4_address: 192.168.71.150
+                ipv4_address: 192.168.71.151
         healthcheck:
             test: /bin/bash -c "pgrep nr-uesoftmodem"
             interval: 10s
             timeout: 5s
             retries: 5
 
+    oai-nr-ue2:
+        image: oai-nr-ue:5fi
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue2
+        environment: 
+            RFSIMULATOR: 192.168.71.141
+            FULL_IMSI: '208990100001101'
+            FULL_KEY: 'fec86ba6eb707ed08905757b1bb44b8f'
+            OPC: 'C42449363BBAD02B66D16BC975D77CC1'
+            DNN: oai
+            NSSAI_SST: 1
+            NSSAI_SD: 1
+            USE_ADDITIONAL_OPTIONS: -E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time
+        depends_on:
+            - oai-gnb1
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.152
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    oai-nr-ue3:
+        image: oai-nr-ue:5fi
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue3
+        environment: 
+            RFSIMULATOR: 192.168.71.141
+            FULL_IMSI: '208990100001102'
+            FULL_KEY: 'fec86ba6eb707ed08905757b1bb44b8f'
+            OPC: 'C42449363BBAD02B66D16BC975D77CC1'
+            DNN: oai
+            NSSAI_SST: 1
+            NSSAI_SD: 1
+            USE_ADDITIONAL_OPTIONS: -E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time
+        depends_on:
+            - oai-gnb2
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.153
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-nr-ue4:
+        image: oai-nr-ue:5fi
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue4
+        environment: 
+            RFSIMULATOR: 192.168.71.141
+            FULL_IMSI: '208990100001103'
+            FULL_KEY: 'fec86ba6eb707ed08905757b1bb44b8f'
+            OPC: 'C42449363BBAD02B66D16BC975D77CC1'
+            DNN: oai
+            NSSAI_SST: 1
+            NSSAI_SD: 1
+            USE_ADDITIONAL_OPTIONS: -E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time
+        depends_on:
+            - oai-gnb2
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.154
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
 networks:
     public_net:
         driver: bridge
