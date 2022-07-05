@@ -311,8 +311,6 @@ services:
 
     oai-nr-ue1:
         image: oai-nr-ue:5fi
-        entrypoint: /bin/bash -c \
-              "apt update; apt install -y procps iptables iproute2 iperf iputils-ping;"
         privileged: true
         container_name: rfsim5g-oai-nr-ue1
         environment: 
