@@ -234,7 +234,7 @@ services:
               "apt update; apt install -y procps iptables iproute2 iperf iputils-ping;"\
               "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;"\
               "ip route add 12.1.1.0/24 via 192.168.72.134 dev eth0;"\
-              "iperf -s -u -i 1;"
+              "iperf -s -i 1 -B 192.168.72.135;"
         depends_on:
             - oai-spgwu
         networks:
