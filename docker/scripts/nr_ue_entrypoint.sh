@@ -47,7 +47,8 @@ while [[ $# -gt 0 ]]; do
   new_args+=("$1")
   shift
 done
-
+echo "starting tcpdump"
+echo "tcpdump -i any -U -w test.pcap &"
 echo "=================================="
 echo "== Starting NR UE soft modem"
 if [[ -v USE_ADDITIONAL_OPTIONS ]]; then
