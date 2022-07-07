@@ -63,9 +63,8 @@ RUN apt-get update && \
 WORKDIR /opt/oai-nr-ue/bin
 COPY --from=nr-ue-build \
     /oai-ran/targets/bin/nr-uesoftmodem.Rel15 \
-    /oai-ran/docker/scripts/entrypoint.sh \
     ./
-
+COPY ./scripts/nr_ue_entrypoint.sh ./entrypoint.sh
 WORKDIR /opt/oai-nr-ue/etc
 COPY --from=nr-ue-build /oai-ran/ci-scripts/conf_files/nr-ue-sim.conf .
 
