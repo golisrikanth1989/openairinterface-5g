@@ -1,7 +1,7 @@
 version: '3.8'
 services:
     oai-nrf:
-        container_name: "rfsim5g-oai-nrf"
+        container_name: "oai-nrf"
         image: oai-nrf:latest
         environment:
             - NRF_INTERFACE_NAME_FOR_SBI=eth0
@@ -21,7 +21,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nrf:
-        container_name: "rfsim5g-oai-nrf"
+        container_name: "oai-nrf"
         image: oai-nrf:latest
         environment:
             - NRF_INTERFACE_NAME_FOR_SBI=eth0
@@ -41,7 +41,7 @@ services:
             timeout: 5s
             retries: 5
     mysql:
-        container_name: "rfsim5g-mysql"
+        container_name: "mysql"
         image: mysql:5.7
         volumes:
             - ./oai_db.sql:/docker-entrypoint-initdb.d/oai_db.sql
@@ -61,7 +61,7 @@ services:
             public_net:
                 ipv4_address: 192.168.71.131
     oai-amf:
-        container_name: "rfsim5g-oai-amf"
+        container_name: "oai-amf"
         image: oai-amf:latest
         environment:
             - TZ=Europe/paris
@@ -129,7 +129,7 @@ services:
             public_net:
                 ipv4_address: 192.168.71.132
     oai-smf:
-        container_name: "rfsim5g-oai-smf"
+        container_name: "oai-smf"
         image: oai-smf:latest
         environment:
             - TZ=Europe/Paris
@@ -175,7 +175,7 @@ services:
             public_net:
                 ipv4_address: 192.168.71.133
     oai-spgwu:
-        container_name: "rfsim5g-oai-spgwu"
+        container_name: "oai-spgwu"
         image: oai-spgwu-tiny:latest
         environment:
             - TZ=Europe/Paris
@@ -229,7 +229,7 @@ services:
     oai-ext-dn:
         image: ubuntu:bionic
         privileged: true
-        container_name: rfsim5g-oai-ext-dn
+        container_name: oai-ext-dn
         entrypoint: /bin/bash -c \
               "apt update; apt install -y procps iptables iproute2 iperf iputils-ping;"\
               "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;"\
@@ -249,7 +249,7 @@ services:
     oai-gnb1:
         image: oai-gnb:develop
         privileged: true
-        container_name: rfsim5g-oai-gnb1
+        container_name: oai-gnb1
         environment: 
             RFSIMULATOR: server
             USE_SA_TDD_MONO: 'yes'
@@ -280,7 +280,7 @@ services:
     oai-gnb2:
         image: oai-gnb:develop
         privileged: true
-        container_name: rfsim5g-oai-gnb2
+        container_name: oai-gnb2
         environment: 
             RFSIMULATOR: server
             USE_SA_FDD_MONO: 'yes'
@@ -312,7 +312,7 @@ services:
     oai-nr-ue1:
         image: oai-nr-ue:5fi
         privileged: true
-        container_name: rfsim5g-oai-nr-ue1
+        container_name: oai-ue1
         environment: 
             RFSIMULATOR: 192.168.71.141
             FULL_IMSI: '208990100001100'
@@ -336,7 +336,7 @@ services:
     oai-nr-ue2:
         image: oai-nr-ue:5fi
         privileged: true
-        container_name: rfsim5g-oai-nr-ue2
+        container_name: oai-ue2
         environment: 
             RFSIMULATOR: 192.168.71.141
             FULL_IMSI: '208990100001101'
@@ -360,7 +360,7 @@ services:
     oai-nr-ue3:
         image: oai-nr-ue:5fi
         privileged: true
-        container_name: rfsim5g-oai-nr-ue3
+        container_name: oai-ue3
         environment: 
             RFSIMULATOR: 192.168.71.141
             FULL_IMSI: '208990100001102'
@@ -383,7 +383,7 @@ services:
     oai-nr-ue4:
         image: oai-nr-ue:5fi
         privileged: true
-        container_name: rfsim5g-oai-nr-ue4
+        container_name: oai-ue4
         environment: 
             RFSIMULATOR: 192.168.71.141
             FULL_IMSI: '208990100001103'
@@ -398,6 +398,29 @@ services:
         networks:
             public_net:
                 ipv4_address: 192.168.71.154
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-nr-ue5:
+        image: oai-nr-ue:5fi
+        privileged: true
+        container_name: oai-ue5
+        environment: 
+            RFSIMULATOR: 192.168.71.141
+            FULL_IMSI: '208990100001104'
+            FULL_KEY: 'fec86ba6eb707ed08905757b1bb44b8f'
+            OPC: 'C42449363BBAD02B66D16BC975D77CC1'
+            DNN: oai
+            NSSAI_SST: 1
+            NSSAI_SD: 1
+            USE_ADDITIONAL_OPTIONS: -E --sa --rfsim -r 106 --numerology 1 -C 3619200000 --nokrnmod --log_config.global_log_options level,nocolor,time
+        depends_on:
+            - oai-gnb2
+        networks:
+            public_net:
+                ipv4_address: 192.168.71.155
         healthcheck:
             test: /bin/bash -c "pgrep nr-uesoftmodem"
             interval: 10s
