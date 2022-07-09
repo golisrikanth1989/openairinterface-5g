@@ -23,3 +23,16 @@ tags
 nfapi_nr_interface_scf
 *.log
 *.out
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap1
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap2
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap3
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap4
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap5
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap6
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap7
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap8
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap9
+ci-scripts/yaml_files/5g_rfsimulator/tcpdump/tcpdump.pcap10
+ci-scripts/yaml_files/5g_rfsimulator/db_for_flask.db
+ci-scripts/yaml_files/5g_rfsimulator/db_for_flask.db

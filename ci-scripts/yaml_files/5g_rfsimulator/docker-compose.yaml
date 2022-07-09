@@ -5,6 +5,7 @@ services:
         network_mode: "host"
         volumes:
             - ./tcpdump:/tcpdump
+        command: [ "-C", "50000" ]
     oai-nrf:
         container_name: "oai-nrf"
         image: oai-nrf:latest
