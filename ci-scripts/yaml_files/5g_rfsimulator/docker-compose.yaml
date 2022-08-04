@@ -290,7 +290,7 @@ services:
             retries: 5
 
     oai-nr-ue1:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: oai-ue1
         environment: 
@@ -314,7 +314,7 @@ services:
             retries: 5
 
     oai-nr-ue2:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: oai-ue2
         environment: 
@@ -338,7 +338,7 @@ services:
             retries: 5
 
     oai-nr-ue3:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: oai-ue3
         environment: 
@@ -361,7 +361,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nr-ue4:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: oai-ue4
         environment: 
@@ -384,7 +384,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nr-ue5:
-        image: oai-nr-ue:5fi
+        image: oai-nr-ue:develop
         privileged: true
         container_name: oai-ue5
         environment: 
